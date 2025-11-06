@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Happy 12th Birthday Fuddy!</title>
+  <title>Happy 48th Birthday Fluffy!</title>
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
@@ -13,20 +13,21 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(180deg, #f2fbff, #fffaf2);
-      background-image: radial-gradient(circle at 20% 20%, #e0f7ff 0%, transparent 50%),
-                        radial-gradient(circle at 80% 80%, #fff0f6 0%, transparent 50%);
+      background: linear-gradient(180deg, #e8f4f8, #f5e8f4); /* Softer, sleepier dusk tones */
+      background-image: radial-gradient(circle at 20% 20%, #c7dfeb 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, #e8c7d9 0%, transparent 50%);
       font-family: 'Poppins', sans-serif;
       color: #4a3c47;
       text-align: center;
       overflow: hidden;
       position: relative;
+      padding: 2vh; /* Added subtle padding for breathing room on all sides */
     }
 
     h1 {
       font-family: 'Great Vibes', cursive;
       font-size: 2.4rem;
-      color: #9c7b6f;
+      color: #8b5a6a; /* Slightly deeper for cozy contrast */
       margin: 0.4em 0 0.2em;
       text-shadow: 0 2px 5px rgba(255, 255, 255, 0.8);
       animation: fadeInDown 1.2s ease both;
@@ -56,25 +57,31 @@
 
     .message {
       font-size: 1.1rem;
+      font-family: 'Dancing Script', cursive;
       line-height: 1.6;
       margin-top: 0.6em;
       padding: 0 1em;
-      color: #6b5450;
+      color: #3f35c9; /* Muted for sleepy vibe */
       animation: fadeInUp 1.5s ease both;
       z-index: 2;
     }
 
     .signature {
-      margin-top: 0.6em;
+      margin-top: 1.5em; /* Increased from 0.6em to add more space above, pulling it away from bottom */
+      margin-bottom: 1em; /* Extra buffer below */
       font-size: 1rem;
-      color: #7a5a6b;
+      color: #6a4a5b; /* Deeper, calmer */
+      font-family: 'Dancing Script', cursive; /* Added whimsical script for a heartfelt touch */
+      line-height: 1.4; /* Better spacing for multi-line */
       animation: fadeInUp 2s ease both;
       z-index: 2;
+      text-align: left; /* Lines start aligned at the left edge of the block */
+      margin-left: 30%; /* Slight offset to the right from center */
+      max-width: 50%; /* Keeps it from spanning too wide */
     }
-
     .koala {
       position: absolute;
-      width: 100px;
+      width: 150px;
       opacity: 0.9;
       animation: float 6s ease-in-out infinite;
       z-index: 1;
@@ -92,51 +99,6 @@
       right: 5%;
       transform: rotate(10deg);
       animation-delay: 1.5s;
-    }
-
-    /* Glitter and Sparkles */
-    .sparkle, .snowflake {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      overflow: hidden;
-      z-index: 0;
-    }
-
-    .sparkle span {
-      position: absolute;
-      display: block;
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background: radial-gradient(circle, #ffd6e8 0%, #fff 40%, transparent 70%);
-      box-shadow: 0 0 8px 3px rgba(255,255,255,0.7);
-      animation: sparkleAnim 4s ease-in-out infinite;
-      opacity: 0.8;
-    }
-
-    @keyframes sparkleAnim {
-      0%, 100% { transform: translateY(0) scale(0.8); opacity: 0.8; }
-      50% { transform: translateY(-15px) scale(1.3); opacity: 1; }
-    }
-
-    .snowflake span {
-      position: absolute;
-      display: block;
-      color: rgba(255,255,255,0.9);
-      font-size: 10px;
-      text-shadow: 0 0 8px rgba(255,255,255,0.8);
-      animation: snowFall linear infinite;
-      opacity: 0.9;
-    }
-
-    @keyframes snowFall {
-      0% { transform: translateY(-10%) rotate(0deg); opacity: 0; }
-      10% { opacity: 1; }
-      100% { transform: translateY(110%) rotate(360deg); opacity: 0; }
     }
 
     @keyframes fadeInDown {
@@ -164,50 +126,22 @@
   <img src="koala.png" alt="koala" class="koala left">
   <img src="koala.png" alt="koala" class="koala right">
 
-  <div class="sparkle" id="sparkle"></div>
-  <div class="snowflake" id="snowflake"></div>
-
-  <h1>Happy 12th Birthday, Fuddy!</h1>
+  <h1>Happy 48th Birthday, Fluffy!</h1>
 
   <div class="photo">
-    <img src="photo.jpeg" alt="Fuddy's birthday photo">
+    <img src="photo.jpg" alt="Fuddy's birthday photo">
   </div>
 
   <div class="message">
-    May you keep dreaming<br>
-    and may all best dreams come true!
+    May you keep Dreaming<br>
+    and may all your Best Dreams come true!
   </div>
 
-  <div class="signature">— Daddy Wayne</div>
+ <div class="signature">
+    Love always,<br>
+    Wayne<br>
+    9 Nov 2025
+  </div>
 
-  <script>
-    // Generate pastel sparkles
-    const sparkleContainer = document.getElementById('sparkle');
-    const pastelColors = ['#ffd6e8', '#fff3b0', '#baf2ef', '#dcd6ff', '#ffe2cc'];
-    for (let i = 0; i < 35; i++) {
-      const s = document.createElement('span');
-      s.style.left = Math.random() * 100 + '%';
-      s.style.top = Math.random() * 100 + '%';
-      s.style.animationDelay = (Math.random() * 3) + 's';
-      s.style.animationDuration = (3 + Math.random() * 3) + 's';
-      const color = pastelColors[Math.floor(Math.random()*pastelColors.length)];
-      s.style.background = `radial-gradient(circle, ${color} 0%, #fff 40%, transparent 70%)`;
-      sparkleContainer.appendChild(s);
-    }
-
-    // Generate snowflakes
-    const snowContainer = document.getElementById('snowflake');
-    const snowChars = ['❄','✦','✧','✩','❅'];
-    for (let i = 0; i < 25; i++) {
-      const f = document.createElement('span');
-      f.textContent = snowChars[Math.floor(Math.random()*snowChars.length)];
-      f.style.left = Math.random() * 100 + '%';
-      f.style.fontSize = (8 + Math.random()*14) + 'px';
-      f.style.animationDuration = (6 + Math.random()*6) + 's';
-      f.style.animationDelay = Math.random() * 5 + 's';
-      f.style.color = pastelColors[Math.floor(Math.random()*pastelColors.length)];
-      snowContainer.appendChild(f);
-    }
-  </script>
 </body>
 </html>
