@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Meeting Mint — Getting Paid to Nod Along</title>
+  <style>
+    :root {
+      --bg-canvas: #0b0f14;
+      --bg-surface: #131922;
+      --bg-elevated: #1b2330;
+      --border-subtle: #263040;
+      --text-primary: #f3f6fa;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --mint: #10b981;
+      --mint-bright: #34d399;
+      --mint-dim: rgba(16, 185, 129, 0.14);
+      --mint-glow: rgba(16, 185, 129, 0.28);
+      --amber: #f59e0b;
+      --danger: #f87171;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Microsoft JhengHei", sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --radius-sm: 9px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-canvas);
+      background-image: radial-gradient(ellipse 90% 45% at 50% -5%, rgba(16, 185, 129, 0.13), transparent);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem 0.9rem 2.5rem;
+      line-height: 1.45;
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+
+    /* Header & Currency Pills */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      min-width: 0;
+    }
+
+    .logo-badge {
+      width: 36px;
+      height: 36px;
+      flex-shrink: 0;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.26), rgba(16, 185, 129, 0.06));
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      display: grid;
+      place-items: center;
+      font-size: 1.1rem;
+    }
+
+    .brand-text h1 {
+      font-size: 1.08rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .brand-text p {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-shrink: 0;
+    }
+
+    .currency-pills {
+      display: inline-flex;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 999px;
+      padding: 2px;
+    }
+
+    .curr-pill {
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 0.34rem 0.55rem;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .curr-pill.active {
+      background: var(--mint);
+      color: #042f1e;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+    }
+
+    .sound-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      display: grid;
+      place-items: center;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .sound-btn.active {
+      border-color: rgba(16, 185, 129, 0.45);
+      background: var(--mint-dim);
+      color: var(--mint-bright);
+    }
+
+    /* Card Base */
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1rem 1.05rem;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.32);
+    }
+
+    /* Salary & Collapsible Schedule */
+    .salary-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    .salary-input-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .field-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-secondary);
+    }
+
+    .salary-field-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .currency-prefix {
+      position: absolute;
+      left: 0.75rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--mint-bright);
+      pointer-events: none;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      border-radius: var(--radius-sm);
+      padding: 0.58rem 0.75rem;
+      font-size: 1rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .salary-field-wrap input {
+      padding-left: 2.75rem;
+    }
+
+    input[type="number"]:focus {
+      outline: none;
+      border-color: var(--mint);
+      box-shadow: 0 0 0 3px var(--mint-dim);
+    }
+
+    .rate-badges {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.2rem;
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+      font-size: 0.76rem;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    .rate-badges strong {
+      color: var(--mint-bright);
+      font-weight: 700;
+    }
+
+    .schedule-toggle {
+      margin-top: 0.75rem;
+      padding-top: 0.65rem;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .schedule-drawer {
+      margin-top: 0.75rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.65rem;
+    }
+
+    .schedule-drawer.collapsed {
+      display: none;
+    }
+
+    .schedule-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    /* Main Live Ticker Card */
+    .ticker-card {
+      text-align: center;
+      padding: 1.5rem 1.05rem 1.25rem;
+      border-color: rgba(16, 185, 129, 0.28);
+      background:
+        radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.11), transparent 72%),
+        var(--bg-surface);
+      transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .ticker-card.running {
+      border-color: rgba(16, 185, 129, 0.6);
+      box-shadow: 0 12px 32px rgba(16, 185, 129, 0.14);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.42rem;
+      padding: 0.28rem 0.75rem;
+      border-radius: 999px;
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-subtle);
+      font-size: 0.73rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      margin-bottom: 0.85rem;
+    }
+
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--text-muted);
+    }
+
+    .ticker-card.running .status-pill {
+      color: var(--mint-bright);
+      border-color: rgba(16, 185, 129, 0.42);
+      background: var(--mint-dim);
+    }
+
+    .ticker-card.running .pulse-dot {
+      background: var(--mint-bright);
+      box-shadow: 0 0 8px var(--mint-bright);
+      animation: pulse 1.3s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.45); opacity: 0.5; }
+    }
+
+    .elapsed-timer {
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      letter-spacing: 0.04em;
+    }
+
+    .ticker-card.running .elapsed-timer {
+      color: var(--text-primary);
+    }
+
+    .earnings-display {
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+      font-size: clamp(2.65rem, 12vw, 3.65rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      color: var(--mint-bright);
+      text-shadow: 0 0 28px var(--mint-glow);
+      margin: 0.3rem 0 1.05rem;
+    }
+
+    /* Milestone Progress Box */
+    .milestone-box {
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 0.8rem 0.9rem;
+      margin-bottom: 1.15rem;
+      text-align: left;
+    }
+
+    .milestone-box.pop {
+      animation: milestonePop 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+      border-color: var(--mint);
+    }
+
+    @keyframes milestonePop {
+      0% { transform: scale(1); }
+      35% { transform: scale(1.02); box-shadow: 0 0 18px var(--mint-glow); }
+      100% { transform: scale(1); }
+    }
+
+    .milestone-msg {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.55rem;
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+      color: var(--text-secondary);
+      margin-bottom: 0.3rem;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 7px;
+      background: var(--bg-elevated);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--mint), var(--mint-bright));
+      border-radius: 999px;
+      transition: width 0.12s linear;
+    }
+
+    /* Mobile Thumb-Friendly Controls */
+    .controls-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .controls-secondary-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+    }
+
+    .btn {
+      width: 100%;
+      min-height: 50px;
+      border: 1px solid transparent;
+      border-radius: var(--radius-md);
+      padding: 0.75rem 1rem;
+      font-size: 0.96rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      transition: transform 0.1s ease, background-color 0.15s ease, opacity 0.15s ease;
+      user-select: none;
+    }
+
+    .btn:active:not(:disabled) {
+      transform: scale(0.985);
+    }
+
+    .btn:disabled {
+      opacity: 0.38;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: var(--mint);
+      color: #042f1e;
+      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.28);
+    }
+
+    .btn-pause {
+      background: var(--amber);
+      color: #271700;
+      box-shadow: 0 4px 16px rgba(245, 158, 11, 0.25);
+    }
+
+    .btn-log {
+      min-height: 46px;
+      font-size: 0.86rem;
+      background: var(--mint-dim);
+      border-color: rgba(16, 185, 129, 0.42);
+      color: var(--mint-bright);
+    }
+
+    .btn-secondary {
+      min-height: 46px;
+      font-size: 0.86rem;
+      background: var(--bg-elevated);
+      border-color: var(--border-subtle);
+      color: var(--text-primary);
+    }
+
+    /* Meeting Log */
+    .history-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .history-title {
+      font-size: 0.92rem;
+      font-weight: 800;
+    }
+
+    .history-total-pill {
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--mint-bright);
+      background: var(--mint-dim);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+    }
+
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+
+    .history-empty {
+      text-align: center;
+      padding: 1.15rem 0.75rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      background: var(--bg-canvas);
+      border-radius: var(--radius-sm);
+      border: 1px dashed var(--border-subtle);
+    }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.6rem;
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 0.55rem 0.75rem;
+    }
+
+    .history-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+
+    .history-note {
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .history-sub {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .history-amount {
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: var(--mint-bright);
+      white-space: nowrap;
+    }
+
+    .history-footer {
+      margin-top: 0.65rem;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .btn-clear {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.74rem;
+      font-weight: 600;
+      padding: 0.25rem 0.45rem;
+      cursor: pointer;
+    }
+
+    .btn-clear.armed {
+      color: var(--danger);
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 1.1rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      background: var(--bg-elevated);
+      border: 1px solid var(--mint);
+      color: var(--text-primary);
+      padding: 0.55rem 1rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 100;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Top Header -->
+    <header>
+      <div class="brand">
+        <div class="logo-badge" aria-hidden="true">🌿</div>
+        <div class="brand-text">
+          <h1 id="appTitle">Meeting Mint</h1>
+          <p id="appSubtitle">Getting paid to nod along</p>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <div class="currency-pills" role="group" aria-label="Currency selector">
+          <button type="button" class="curr-pill active" data-curr="SGD">SGD</button>
+          <button type="button" class="curr-pill" data-curr="TWD">TWD</button>
+          <button type="button" class="curr-pill" data-curr="USD">USD</button>
+        </div>
+        <button type="button" id="soundToggleBtn" class="sound-btn active" aria-label="Toggle chime">🔔</button>
+      </div>
+    </header>
+
+    <!-- Salary & Collapsible Work Schedule -->
+    <section class="card">
+      <div class="salary-top-row">
+        <div class="salary-input-group">
+          <label id="salaryLabel" class="field-label" for="monthlySalaryInput">Monthly Salary</label>
+          <div class="salary-field-wrap">
+            <span id="currencyPrefix" class="currency-prefix">S$</span>
+            <input id="monthlySalaryInput" type="number" inputmode="decimal" min="0" step="100" value="5000" />
+          </div>
+        </div>
+
+        <div class="rate-badges">
+          <span><strong id="rateHour">S$28.85</strong> <span id="perHourLabel">/ hr</span></span>
+          <span><strong id="rateMinute">S$0.48</strong> <span id="perMinLabel">/ min</span></span>
+        </div>
+      </div>
+
+      <div id="scheduleToggle" class="schedule-toggle" role="button" tabindex="0" aria-expanded="false">
+        <span id="scheduleToggleLabel">⚙️ Work Schedule (5d/wk • 8h/day)</span>
+        <span id="scheduleArrow">▸</span>
+      </div>
+
+      <div id="scheduleDrawer" class="schedule-drawer collapsed">
+        <div class="schedule-field">
+          <label id="daysWeekLabel" class="field-label" for="daysPerWeekInput">Days / Week</label>
+          <input id="daysPerWeekInput" type="number" inputmode="decimal" min="1" max="7" step="0.5" value="5" />
+        </div>
+        <div class="schedule-field">
+          <label id="hoursDayLabel" class="field-label" for="hoursPerDayInput">Hours / Day</label>
+          <input id="hoursPerDayInput" type="number" inputmode="decimal" min="1" max="24" step="0.5" value="8" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Cents-Only Live Earnings Ticker -->
+    <main id="tickerCard" class="card ticker-card">
+      <div class="status-pill">
+        <span class="pulse-dot"></span>
+        <span id="statusText">Ready to nod along?</span>
+      </div>
+
+      <div id="elapsedTimer" class="elapsed-timer" aria-label="Elapsed meeting time">00:00:00</div>
+
+      <div id="earningsDisplay" class="earnings-display" aria-live="off">S$0.00</div>
+
+      <div id="milestoneBox" class="milestone-box">
+        <div class="milestone-msg">
+          <span id="milestoneEmoji">🙂</span>
+          <span id="milestoneText">Hit Start as the meeting begins. Put on your serious nodding face.</span>
+        </div>
+        <div class="progress-meta">
+          <span id="nextMilestoneLabel">Next perk: Coffee (S$2.00)</span>
+          <span id="nextMilestonePct">0%</span>
+        </div>
+        <div class="progress-track">
+          <div id="progressFill" class="progress-fill"></div>
+        </div>
+      </div>
+
+      <div class="controls-stack">
+        <button id="startPauseBtn" class="btn btn-primary" type="button">▶ Start Meeting</button>
+        <div class="controls-secondary-row">
+          <button id="logBtn" class="btn btn-log" type="button" disabled>💾 Log Meeting</button>
+          <button id="resetBtn" class="btn btn-secondary" type="button" disabled>↺ Reset</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Survived Meetings Log -->
+    <section class="card">
+      <div class="history-header">
+        <h2 id="historyTitle" class="history-title">🧾 Survived Meetings</h2>
+        <span id="totalHistoryEarned" class="history-total-pill">S$0.00</span>
+      </div>
+
+      <div id="historyList" class="history-list">
+        <div class="history-empty">No meetings logged yet.</div>
+      </div>
+
+      <div id="historyFooter" class="history-footer" style="display: none;">
+        <button id="clearHistoryBtn" class="btn-clear" type="button">Clear Log</button>
+      </div>
+    </section>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      const STORAGE_KEY = 'meeting_mint_v2_state';
+      const HISTORY_KEY = 'meeting_mint_v2_history';
+
+      // Currency definitions in strict order: SGD, TWD, USD
+      const CURRENCIES = {
+        SGD: { symbol: 'S$', defaultSalary: 5000, lang: 'en' },
+        TWD: { symbol: 'NT$', defaultSalary: 100000, lang: 'zh' },
+        USD: { symbol: '$', defaultSalary: 5000, lang: 'en' }
+      };
+
+      // Bilingual UI Copy (English for SGD/USD, Traditional Chinese for TWD)
+      const I18N = {
+        en: {
+          htmlLang: 'en',
+          tabTitle: 'Meeting Mint — Getting Paid to Nod Along',
+          appTitle: 'Meeting Mint',
+          appSubtitle: 'Getting paid to nod along',
+          salaryLabel: 'Monthly Salary',
+          perHour: '/ hr',
+          perMin: '/ min',
+          scheduleLabel: (d, h) => `⚙️ Work Schedule (${d}d/wk • ${h}h/day)`,
+          daysWeek: 'Days / Week',
+          hoursDay: 'Hours / Day',
+          statusReady: 'Ready to nod along?',
+          statusRunning: 'In Meeting — Keep Nodding',
+          statusPaused: 'Paused — Pretending to Think',
+          startBtn: '▶ Start Meeting',
+          pauseBtn: '⏸ Pause',
+          resumeBtn: '▶ Resume',
+          logBtn: '💾 Log Meeting',
+          resetBtn: '↺ Reset',
+          historyTitle: '🧾 Survived Meetings',
+          historyEmpty: 'No meetings logged yet. Survive one and log it!',
+          historyItemTitle: 'Survived Meeting',
+          clearBtn: 'Clear Log',
+          clearConfirm: 'Tap again to clear',
+          toastLogged: (amt) => `Logged ${amt} earned!`,
+          toastTooShort: 'Stay at least 1 second first!',
+          toastCleared: 'Meeting log cleared.',
+          nextPerk: (perk, amt) => `Next perk: ${perk} (${amt})`,
+          maxPerk: 'Max perk unlocked: Pure Corporate Zen',
+          milestones: [
+            { amount: 0,   emoji: '🙂', perk: 'Kopi / Coffee',     msg: 'Hit Start as the meeting begins. Put on your serious nodding face.' },
+            { amount: 2,   emoji: '☕', perk: 'Kaya Toast Set',    msg: 'That just paid for a fresh coffee! Keep nodding thoughtfully.' },
+            { amount: 6,   emoji: '🥪', perk: 'Decent Lunch',      msg: 'Snack secured. Say "Let’s circle back" for extra credibility.' },
+            { amount: 15,  emoji: '🍜', perk: 'Movie Ticket',      msg: 'Lunch is officially covered. Could have been an email, though.' },
+            { amount: 30,  emoji: '🎬', perk: 'Nice Dinner Out',   msg: 'You just earned a movie ticket just by unmuting once.' },
+            { amount: 60,  emoji: '🗿', perk: 'Weekend Brunch',    msg: 'At this point you are a highly paid decorative statue.' },
+            { amount: 120, emoji: '🥂', perk: 'Massage Fund',      msg: 'Weekend brunch unlocked! Keep staring at the shared screen.' },
+            { amount: 250, emoji: '👑', perk: 'Corporate Zen',     msg: 'Absolute legend. Pure paid enlightenment achieved.' }
+          ]
+        },
+        zh: {
+          htmlLang: 'zh-Hant',
+          tabTitle: '會議印鈔機 — 廢話聽越多，薪水賺越多',
+          appTitle: '會議印鈔機',
+          appSubtitle: '廢話聽越多，薪水賺越多',
+          salaryLabel: '月薪',
+          perHour: '/ 每小時',
+          perMin: '/ 每分鐘',
+          scheduleLabel: (d, h) => `⚙️ 工作時數設定（每週${d}天 • 每日${h}小時）`,
+          daysWeek: '每週工作天數',
+          hoursDay: '每日工時',
+          statusReady: '準備好無痛賺錢了嗎？',
+          statusRunning: '會議進行中 — 保持微笑點頭',
+          statusPaused: '已暫停 — 假裝在思考',
+          startBtn: '▶ 開始計時',
+          pauseBtn: '⏸ 暫停',
+          resumeBtn: '▶ 繼續',
+          logBtn: '💾 結束並紀錄',
+          resetBtn: '↺ 重設',
+          historyTitle: '🧾 會議戰績',
+          historyEmpty: '沒有紀錄，快進會議室開始印鈔吧！',
+          historyItemTitle: '成功撐過一場會議',
+          clearBtn: '清除紀錄',
+          clearConfirm: '再點一次確認清除',
+          toastLogged: (amt) => `已紀錄！這場賺了 ${amt}`,
+          toastTooShort: '至少撐滿 1 秒再紀錄吧！',
+          toastCleared: '會議紀錄已清除',
+          nextPerk: (perk, amt) => `下個目標：${perk}（${amt}）`,
+          maxPerk: '已解鎖最高境界：帶薪放空大師',
+          milestones: [
+            { amount: 0,    emoji: '🙂', perk: '買杯超商咖啡',   msg: '按下開始計時，擺出你最專業的認真點頭表情。' },
+            { amount: 45,   emoji: '☕', perk: '雞排加珍奶',     msg: '賺到一杯超商咖啡了！繼續保持眼神專注。' },
+            { amount: 150,  emoji: '🧋', perk: '精緻早午餐',     msg: '雞排加珍奶已入袋！適時說句「我補充一點」更有說服力。' },
+            { amount: 350,  emoji: '🥞', perk: '電影票一張',     msg: '這明明一封 Email 就能解決，但你的早午餐已經有著落了。' },
+            { amount: 600,  emoji: '🎬', perk: '頂級燒肉大餐',   msg: '剛才只開麥克風講了一句「同意」，就賺到一張電影票。' },
+            { amount: 1200, emoji: '🥩', perk: '肩頸按摩基金',   msg: '頂級燒肉大餐解鎖！繼續盯著共享螢幕放空吧。' },
+            { amount: 2000, emoji: '💆', perk: '帶薪放空大師',   msg: '這筆錢剛好拿去按摩，治療這場會議造成的肩頸僵硬。' },
+            { amount: 3000, emoji: '👑', perk: '帶薪放空大師',   msg: '傳說級薪水小偷誕生，已修成帶薪放空最高境界！' }
+          ]
+        }
+      };
+
+      // App State with per-currency saved salaries
+      let state = {
+        currency: 'SGD',
+        salaries: {
+          SGD: 5000,
+          TWD: 100000,
+          USD: 5000
+        },
+        daysPerWeek: 5,
+        hoursPerDay: 8,
+        soundEnabled: true,
+        scheduleOpen: false
+      };
+
+      let history = [];
+      let isRunning = false;
+      let startTimestamp = 0;
+      let accumulatedMs = 0;
+      let rafId = null;
+      let lastMilestoneIndex = 0;
+      let clearArmed = false;
+      let clearTimer = null;
+
+      // DOM References
+      const el = {
+        appTitle: document.getElementById('appTitle'),
+        appSubtitle: document.getElementById('appSubtitle'),
+        currPills: document.querySelectorAll('.curr-pill'),
+        soundToggleBtn: document.getElementById('soundToggleBtn'),
+        salaryLabel: document.getElementById('salaryLabel'),
+        currencyPrefix: document.getElementById('currencyPrefix'),
+        monthlySalaryInput: document.getElementById('monthlySalaryInput'),
+        rateHour: document.getElementById('rateHour'),
+        rateMinute: document.getElementById('rateMinute'),
+        perHourLabel: document.getElementById('perHourLabel'),
+        perMinLabel: document.getElementById('perMinLabel'),
+        scheduleToggle: document.getElementById('scheduleToggle'),
+        scheduleToggleLabel: document.getElementById('scheduleToggleLabel'),
+        scheduleArrow: document.getElementById('scheduleArrow'),
+        scheduleDrawer: document.getElementById('scheduleDrawer'),
+        daysWeekLabel: document.getElementById('daysWeekLabel'),
+        hoursDayLabel: document.getElementById('hoursDayLabel'),
+        daysPerWeekInput: document.getElementById('daysPerWeekInput'),
+        hoursPerDayInput: document.getElementById('hoursPerDayInput'),
+        tickerCard: document.getElementById('tickerCard'),
+        statusText: document.getElementById('statusText'),
+        elapsedTimer: document.getElementById('elapsedTimer'),
+        earningsDisplay: document.getElementById('earningsDisplay'),
+        milestoneBox: document.getElementById('milestoneBox'),
+        milestoneEmoji: document.getElementById('milestoneEmoji'),
+        milestoneText: document.getElementById('milestoneText'),
+        nextMilestoneLabel: document.getElementById('nextMilestoneLabel'),
+        nextMilestonePct: document.getElementById('nextMilestonePct'),
+        progressFill: document.getElementById('progressFill'),
+        startPauseBtn: document.getElementById('startPauseBtn'),
+        logBtn: document.getElementById('logBtn'),
+        resetBtn: document.getElementById('resetBtn'),
+        historyTitle: document.getElementById('historyTitle'),
+        totalHistoryEarned: document.getElementById('totalHistoryEarned'),
+        historyList: document.getElementById('historyList'),
+        historyFooter: document.getElementById('historyFooter'),
+        clearHistoryBtn: document.getElementById('clearHistoryBtn'),
+        toast: document.getElementById('toast')
+      };
+
+      // Web Audio API gentle coin chime
+      let audioCtx = null;
+      function playCoinChime() {
+        if (!state.soundEnabled) return;
+        try {
+          if (!audioCtx) {
+            const Ctx = window.AudioContext || window.webkitAudioContext;
+            if (!Ctx) return;
+            audioCtx = new Ctx();
+          }
+          if (audioCtx.state === 'suspended') audioCtx.resume();
+          const now = audioCtx.currentTime;
+          [987.77, 1318.51].forEach((freq, i) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now + i * 0.08);
+            gain.gain.setValueAtTime(0.0001, now + i * 0.08);
+            gain.gain.exponentialRampToValueAtTime(0.11, now + i * 0.08 + 0.015);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.08 + 0.34);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now + i * 0.08);
+            osc.stop(now + i * 0.08 + 0.36);
+          });
+        } catch (e) {}
+      }
+
+      // Helpers
+      function getLangPack() {
+        const langKey = CURRENCIES[state.currency]?.lang || 'en';
+        return I18N[langKey];
+      }
+
+      function getSymbol(curr = state.currency) {
+        return CURRENCIES[curr]?.symbol || 'S$';
+      }
+
+      function formatCents(amount, curr = state.currency) {
+        const sym = getSymbol(curr);
+        const val = Number(amount || 0).toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
+        return `${sym}${val}`;
+      }
+
+      function getPerSecondRate() {
+        const salary = Math.max(0, Number(state.salaries[state.currency]) || 0);
+        const daysPerWeek = Math.max(0.5, Number(state.daysPerWeek) || 5);
+        const hoursPerDay = Math.max(0.5, Number(state.hoursPerDay) || 8);
+        // Average weeks per month = 52 / 12 (~4.3333)
+        const monthlyHours = daysPerWeek * hoursPerDay * (52 / 12);
+        return salary / (monthlyHours * 3600);
+      }
+
+      function formatDuration(ms) {
+        const totalSec = Math.floor(ms / 1000);
+        const h = Math.floor(totalSec / 3600);
+        const m = Math.floor((totalSec % 3600) / 60);
+        const s = totalSec % 60;
+        return [h, m, s].map(n => String(n).padStart(2, '0')).join(':');
+      }
+
+      function showToast(msg) {
+        el.toast.textContent = msg;
+        el.toast.classList.add('show');
+        clearTimeout(showToast._t);
+        showToast._t = setTimeout(() => el.toast.classList.remove('show'), 2300);
+      }
+
+      // Persistence
+      function loadData() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+          if (saved && typeof saved === 'object') {
+            state = {
+              ...state,
+              ...saved,
+              salaries: { ...state.salaries, ...(saved.salaries || {}) }
+            };
+          }
+        } catch (e) {}
+
+        try {
+          const savedHist = JSON.parse(localStorage.getItem(HISTORY_KEY));
+          if (Array.isArray(savedHist)) history = savedHist;
+        } catch (e) {}
+      }
+
+      function saveData() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch (e) {}
+      }
+
+      function saveHistory() {
+        try {
+          localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+        } catch (e) {}
+      }
+
+      // UI Sync & Localization
+      function applyLanguageAndSettings() {
+        const t = getLangPack();
+        document.documentElement.lang = t.htmlLang;
+
+        el.appTitle.textContent = t.appTitle;
+        el.appSubtitle.textContent = t.appSubtitle;
+        el.salaryLabel.textContent = t.salaryLabel;
+        el.perHourLabel.textContent = t.perHour;
+        el.perMinLabel.textContent = t.perMin;
+        el.daysWeekLabel.textContent = t.daysWeek;
+        el.hoursDayLabel.textContent = t.hoursDay;
+        el.logBtn.textContent = t.logBtn;
+        el.resetBtn.textContent = t.resetBtn;
+        el.historyTitle.textContent = t.historyTitle;
+        el.clearHistoryBtn.textContent = clearArmed ? t.clearConfirm : t.clearBtn;
+
+        el.currPills.forEach(pill => {
+          pill.classList.toggle('active', pill.dataset.curr === state.currency);
+        });
+
+        el.soundToggleBtn.classList.toggle('active', state.soundEnabled);
+        el.soundToggleBtn.textContent = state.soundEnabled ? '🔔' : '🔕';
+
+        el.currencyPrefix.textContent = getSymbol();
+        el.monthlySalaryInput.value = state.salaries[state.currency];
+        el.daysPerWeekInput.value = state.daysPerWeek;
+        el.hoursPerDayInput.value = state.hoursPerDay;
+
+        el.scheduleToggleLabel.textContent = t.scheduleLabel(state.daysPerWeek, state.hoursPerDay);
+        el.scheduleArrow.textContent = state.scheduleOpen ? '▾' : '▸';
+        el.scheduleDrawer.classList.toggle('collapsed', !state.scheduleOpen);
+        el.scheduleToggle.setAttribute('aria-expanded', String(state.scheduleOpen));
+
+        updateRates();
+        updateControls();
+        renderHistory();
+        renderTicker();
+      }
+
+      function updateRates() {
+        const perSec = getPerSecondRate();
+        el.rateHour.textContent = formatCents(perSec * 3600);
+        el.rateMinute.textContent = formatCents(perSec * 60);
+      }
+
+      function updateMilestones(earned, currentMs) {
+        const t = getLangPack();
+        const list = t.milestones;
+
+        let activeIdx = 0;
+        for (let i = list.length - 1; i >= 0; i--) {
+          if (earned >= list[i].amount) {
+            activeIdx = i;
+            break;
+          }
+        }
+
+        if (activeIdx > lastMilestoneIndex && currentMs > 0) {
+          lastMilestoneIndex = activeIdx;
+          playCoinChime();
+          el.milestoneBox.classList.remove('pop');
+          void el.milestoneBox.offsetWidth;
+          el.milestoneBox.classList.add('pop');
+        }
+
+        const currentM = list[activeIdx];
+        const nextM = list[activeIdx + 1];
+
+        el.milestoneEmoji.textContent = currentM.emoji;
+        el.milestoneText.textContent = currentM.msg;
+
+        if (nextM) {
+          const span = nextM.amount - currentM.amount;
+          const pct = Math.min(100, Math.max(0, ((earned - currentM.amount) / span) * 100));
+          el.nextMilestoneLabel.textContent = t.nextPerk(currentM.perk, formatCents(nextM.amount));
+          el.nextMilestonePct.textContent = `${Math.floor(pct)}%`;
+          el.progressFill.style.width = `${pct}%`;
+        } else {
+          el.nextMilestoneLabel.textContent = t.maxPerk;
+          el.nextMilestonePct.textContent = '100%';
+          el.progressFill.style.width = '100%';
+        }
+      }
+
+      function renderTicker(now = performance.now()) {
+        const t = getLangPack();
+        const currentMs = isRunning ? accumulatedMs + (now - startTimestamp) : accumulatedMs;
+        const earned = (currentMs / 1000) * getPerSecondRate();
+        const formatted = formatCents(earned);
+
+        el.elapsedTimer.textContent = formatDuration(currentMs);
+        el.earningsDisplay.textContent = formatted;
+
+        if (isRunning) {
+          document.title = `${formatted} • ${t.appTitle}`;
+        } else {
+          document.title = t.tabTitle;
+        }
+
+        updateMilestones(earned, currentMs);
+
+        if (isRunning) {
+          rafId = requestAnimationFrame(renderTicker);
+        }
+      }
+
+      function updateControls() {
+        const t = getLangPack();
+        const hasTime = accumulatedMs > 0 || isRunning;
+        el.tickerCard.classList.toggle('running', isRunning);
+
+        if (isRunning) {
+          el.statusText.textContent = t.statusRunning;
+          el.startPauseBtn.textContent = t.pauseBtn;
+          el.startPauseBtn.className = 'btn btn-pause';
+        } else if (accumulatedMs > 0) {
+          el.statusText.textContent = t.statusPaused;
+          el.startPauseBtn.textContent = t.resumeBtn;
+          el.startPauseBtn.className = 'btn btn-primary';
+        } else {
+          el.statusText.textContent = t.statusReady;
+          el.startPauseBtn.textContent = t.startBtn;
+          el.startPauseBtn.className = 'btn btn-primary';
+        }
+
+        el.logBtn.disabled = !hasTime;
+        el.resetBtn.disabled = !hasTime;
+      }
+
+      // Timer Actions
+      function toggleStartPause() {
+        if (isRunning) {
+          accumulatedMs += performance.now() - startTimestamp;
+          isRunning = false;
+          if (rafId) cancelAnimationFrame(rafId);
+          updateControls();
+          renderTicker();
+        } else {
+          isRunning = true;
+          startTimestamp = performance.now();
+          updateControls();
+          rafId = requestAnimationFrame(renderTicker);
+        }
+      }
+
+      function resetTimer() {
+        isRunning = false;
+        if (rafId) cancelAnimationFrame(rafId);
+        accumulatedMs = 0;
+        lastMilestoneIndex = 0;
+        updateControls();
+        renderTicker();
+      }
+
+      function logMeeting() {
+        const t = getLangPack();
+        const totalMs = isRunning ? accumulatedMs + (performance.now() - startTimestamp) : accumulatedMs;
+        if (totalMs < 1000) {
+          showToast(t.toastTooShort);
+          return;
+        }
+
+        const earned = (totalMs / 1000) * getPerSecondRate();
+        const entry = {
+          id: Date.now(),
+          timestamp: new Date().toLocaleTimeString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+          durationMs: totalMs,
+          earned,
+          currency: state.currency
+        };
+
+        history.unshift(entry);
+        saveHistory();
+        playCoinChime();
+        showToast(t.toastLogged(formatCents(earned)));
+        resetTimer();
+        renderHistory();
+      }
+
+      function renderHistory() {
+        const t = getLangPack();
+        // Sum totals matching active currency or display active currency total
+        const activeCurrencyTotal = history
+          .filter(item => (item.currency || 'SGD') === state.currency)
+          .reduce((sum, item) => sum + Number(item.earned || 0), 0);
+
+        el.totalHistoryEarned.textContent = formatCents(activeCurrencyTotal);
+
+        if (history.length === 0) {
+          el.historyList.innerHTML = `<div class="history-empty">${t.historyEmpty}</div>`;
+          el.historyFooter.style.display = 'none';
+          return;
+        }
+
+        el.historyFooter.style.display = 'flex';
+        el.historyList.innerHTML = history.map(item => {
+          const itemCurr = item.currency || 'SGD';
+          return `
+            <div class="history-item">
+              <div class="history-meta">
+                <span class="history-note">${t.historyItemTitle}</span>
+                <span class="history-sub">${item.timestamp} • ${formatDuration(item.durationMs)}</span>
+              </div>
+              <div class="history-amount">+${formatCents(item.earned, itemCurr)}</div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Event Bindings
+      el.currPills.forEach(pill => {
+        pill.addEventListener('click', () => {
+          const nextCurr = pill.dataset.curr;
+          if (!CURRENCIES[nextCurr] || nextCurr === state.currency) return;
+          state.currency = nextCurr;
+          // Ensure default salary exists for this currency if unset
+          if (state.salaries[nextCurr] === undefined || state.salaries[nextCurr] === null) {
+            state.salaries[nextCurr] = CURRENCIES[nextCurr].defaultSalary;
+          }
+          lastMilestoneIndex = 0;
+          saveData();
+          applyLanguageAndSettings();
+        });
+      });
+
+      el.monthlySalaryInput.addEventListener('input', (e) => {
+        const val = parseFloat(e.target.value);
+        state.salaries[state.currency] = Number.isFinite(val) && val >= 0 ? val : 0;
+        saveData();
+        updateRates();
+        renderTicker();
+      });
+
+      el.scheduleToggle.addEventListener('click', () => {
+        state.scheduleOpen = !state.scheduleOpen;
+        saveData();
+        applyLanguageAndSettings();
+      });
+
+      el.scheduleToggle.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          el.scheduleToggle.click();
+        }
+      });
+
+      el.daysPerWeekInput.addEventListener('input', (e) => {
+        const val = parseFloat(e.target.value);
+        if (Number.isFinite(val) && val > 0) {
+          state.daysPerWeek = Math.min(7, val);
+          saveData();
+          el.scheduleToggleLabel.textContent = getLangPack().scheduleLabel(state.daysPerWeek, state.hoursPerDay);
+          updateRates();
+          renderTicker();
+        }
+      });
+
+      el.hoursPerDayInput.addEventListener('input', (e) => {
+        const val = parseFloat(e.target.value);
+        if (Number.isFinite(val) && val > 0) {
+          state.hoursPerDay = Math.min(24, val);
+          saveData();
+          el.scheduleToggleLabel.textContent = getLangPack().scheduleLabel(state.daysPerWeek, state.hoursPerDay);
+          updateRates();
+          renderTicker();
+        }
+      });
+
+      el.soundToggleBtn.addEventListener('click', () => {
+        state.soundEnabled = !state.soundEnabled;
+        saveData();
+        applyLanguageAndSettings();
+        if (state.soundEnabled) playCoinChime();
+      });
+
+      el.startPauseBtn.addEventListener('click', toggleStartPause);
+      el.resetBtn.addEventListener('click', resetTimer);
+      el.logBtn.addEventListener('click', logMeeting);
+
+      el.clearHistoryBtn.addEventListener('click', () => {
+        const t = getLangPack();
+        if (!clearArmed) {
+          clearArmed = true;
+          el.clearHistoryBtn.classList.add('armed');
+          el.clearHistoryBtn.textContent = t.clearConfirm;
+          clearTimer = setTimeout(() => {
+            clearArmed = false;
+            el.clearHistoryBtn.classList.remove('armed');
+            el.clearHistoryBtn.textContent = getLangPack().clearBtn;
+          }, 2800);
+          return;
+        }
+        clearTimeout(clearTimer);
+        clearArmed = false;
+        el.clearHistoryBtn.classList.remove('armed');
+        history = [];
+        saveHistory();
+        renderHistory();
+        el.clearHistoryBtn.textContent = t.clearBtn;
+        showToast(t.toastCleared);
+      });
+
+      // Init
+      loadData();
+      applyLanguageAndSettings();
+    })();
+  </script>
+</body>
+</html>
